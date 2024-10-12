@@ -1,27 +1,45 @@
 import { plainToInstance } from 'class-transformer';
 import { validateOrReject, ValidationError } from 'class-validator';
 import { NextFunction, Request, Response } from 'express';
-import { HttpException } from '@exceptions/httpException';
 
 /**
  * @name ValidationMiddleware
- * @description Allows use of decorator and non-decorator based validation
- * @param type dto
- * @param skipMissingProperties When skipping missing properties
- * @param whitelist Even if your object is an instance of a validation class it can contain additional properties that are not defined
- * @param forbidNonWhitelisted If you would rather to have an error thrown when any non-whitelisted properties are present
+ * @description Middleware dùng để validate dữ liệu từ request (body, params, query)
+ * @param type DTO được sử dụng để validate
+ * @param source 'body' | 'params' | 'query' | 'headers'
+ * @param skipMissingProperties Khi bỏ qua các trường bị thiếu
+ * @param whitelist Cho phép loại bỏ các thuộc tính không nằm trong DTO
+ * @param forbidNonWhitelisted Ném ra lỗi nếu có thuộc tính không nằm trong whitelist
  */
-export const ValidationMiddleware = (type: any, skipMissingProperties = false, whitelist = false, forbidNonWhitelisted = false) => {
+export const ValidationMiddleware = (
+  type: any,
+  source: 'body' | 'params' | 'query' | 'headers' = 'body',
+  skipMissingProperties = false,
+  whitelist = false,
+  forbidNonWhitelisted = false,
+) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const dto = plainToInstance(type, req.body);
+    // Chọn source cần validate
+    const dataToValidate = req[source];
+    const dto = plainToInstance(type, dataToValidate);
     validateOrReject(dto, { skipMissingProperties, whitelist, forbidNonWhitelisted })
       .then(() => {
-        req.body = dto;
+        // Cập nhật dữ liệu đã validate lại vào request
+        req[source] = dto;
         next();
       })
       .catch((errors: ValidationError[]) => {
-        const message = errors.map((error: ValidationError) => Object.values(error.constraints)).join(', ');
-        next(new HttpException(400, message));
+        const errorMessages = errors.map((error: ValidationError) => ({
+          property: error.property,
+          constraints: error.constraints,
+        }));
+
+        // Trả về lỗi JSON với thông báo chi tiết
+        res.status(400).json({
+          status: false,
+          message: 'Invalid request data',
+          errors: errorMessages,
+        });
       });
   };
 };

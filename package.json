@@ -16,6 +16,7 @@
     "deploy:dev": "pm2 start ecosystem.config.js --only dev"
   },
   "dependencies": {
+    "axios": "^1.7.7",
     "bcrypt": "^5.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
@@ -29,12 +30,13 @@
     "hpp": "^0.2.3",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
+    "node-cron": "^3.0.3",
     "pg": "^8.7.3",
     "reflect-metadata": "^0.1.13",
     "swagger-jsdoc": "^6.2.1",
     "swagger-ui-express": "^4.5.0",
-    "typeorm": "^0.2.45",
     "typedi": "^0.10.0",
+    "typeorm": "^0.2.45",
     "winston": "^3.8.1",
     "winston-daily-rotate-file": "^4.7.1"
   },
@@ -51,6 +53,7 @@
     "@types/jsonwebtoken": "^8.5.8",
     "@types/morgan": "^1.9.3",
     "@types/node": "^17.0.45",
+    "@types/node-cron": "^3.0.11",
     "@types/supertest": "^2.0.12",
     "@types/swagger-jsdoc": "^6.0.1",
     "@types/swagger-ui-express": "^4.1.3",

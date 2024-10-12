@@ -13,6 +13,7 @@ import { dbConnection } from '@database';
 import { Routes } from '@interfaces/routes.interface';
 import { ErrorMiddleware } from '@middlewares/error.middleware';
 import { logger, stream } from '@utils/logger';
+import { CronJobService } from './tasks';
 
 export class App {
   public app: express.Application;
@@ -29,6 +30,7 @@ export class App {
     this.initializeRoutes(routes);
     this.initializeSwagger();
     this.initializeErrorHandling();
+    this.initBackgroudTask();
   }
 
   public listen() {
@@ -83,5 +85,9 @@ export class App {
 
   private initializeErrorHandling() {
     this.app.use(ErrorMiddleware);
+  }
+  private initBackgroudTask() {
+    logger.info('Initializing background tasks...');
+    new CronJobService();
   }
 }

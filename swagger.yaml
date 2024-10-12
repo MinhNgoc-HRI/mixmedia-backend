@@ -1,3 +1,10 @@
+
+securityDefinitions:
+  Bearer:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+
 tags:
 - name: users
   description: users API
@@ -8,6 +15,8 @@ paths:
     get:
       tags:
       - users
+      security:
+      - Bearer: []
       summary: Find All Users
       responses:
         200:
@@ -102,6 +111,57 @@ paths:
           description: 'Conflict'
         500:
           description: 'Server Error'
+
+ # [GET] movies
+  /movies:
+    get:
+      tags:
+        - movies
+      security:
+        - Bearer: []
+      summary: Retrieve a list of movies
+      parameters:
+        - name: page
+          in: query
+          description: The page number for pagination
+          required: false
+          type: integer
+        - name: total
+          in: query
+          description: The total number of movies to retrieve per page
+          required: false
+          type: integer
+      responses:
+        200:
+          description: Successfully retrieved the list of movies
+          schema:
+            type: object
+            properties:
+              status:
+                type: boolean
+                description: Indicates if the request was successful
+              message:
+                type: string
+                description: Response message
+              movies:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: The unique identifier of the movie
+                    title:
+                      type: string
+                      description: The title of the movie
+                    country:
+                      type: string
+                      description: The country where the movie was produced
+                    category:
+                      type: string
+                      description: The category or genre of the movie
+        500:
+          description: Internal Server Error
 
 # definitions
 definitions:
