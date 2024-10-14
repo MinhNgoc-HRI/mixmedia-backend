@@ -226,4 +226,71 @@ export class MovieService extends Repository<MovieEntity> {
       data: movie,
     };
   }
+
+  public async getMovieByQuery(
+    page: number,
+    total: number,
+    country?: string[],
+    category?: string[],
+    slug?: string,
+    asc = true,
+  ): Promise<{
+    data: Movie[];
+    total_items: number;
+    current_page: number;
+    total_pages: number;
+  }> {
+    try {
+      // Khởi tạo query builder cho thực thể Movie
+      const queryBuilder = MovieEntity.createQueryBuilder('movie')
+        .leftJoinAndSelect('movie.country', 'country') // Join với bảng country
+        .leftJoinAndSelect('movie.category', 'category') // Join với bảng category
+        .leftJoinAndSelect('movie.episodes', 'episodes') // Join với bảng episodes
+        .addSelect('category.id', 'id')
+        .addSelect('country.id', 'id')
+        .addSelect('episodes.id', 'id');
+
+      // Thêm điều kiện lọc theo slug (nếu có)
+      if (slug) {
+        queryBuilder.andWhere('movie.name LIKE :slug', { slug: `%${slug}%` });
+      }
+
+      // Thêm điều kiện lọc theo slug của category (nếu có)
+      if (category && category.length > 0) {
+        queryBuilder.andWhere('category.slug IN (:...category)', { category });
+      }
+
+      // Thêm điều kiện lọc theo slug của country (nếu có)
+      if (country && country.length > 0) {
+        queryBuilder.andWhere('movie.slug IN (:...country)', { country });
+      }
+
+      // Sắp xếp theo modified time
+      if (asc) {
+        queryBuilder.orderBy('movie.modified', 'DESC'); // Sắp xếp theo modifiedAt giảm dần
+      }
+
+      // Đếm tổng số bản ghi để tính tổng trang
+      const total_items = await queryBuilder.getCount();
+
+      // Áp dụng phân trang (page và total)
+      const data = await queryBuilder
+        .skip((page - 1) * total) // Bỏ qua các bản ghi không thuộc trang hiện tại
+        .take(total) // Giới hạn số bản ghi trả về
+        .getMany(); // Thực hiện query và lấy kết quả
+
+      // Tính tổng số trang
+      const total_pages = Math.ceil(total_items / total);
+
+      // Trả về dữ liệu
+      return {
+        data,
+        total_items,
+        current_page: page,
+        total_pages,
+      };
+    } catch (error) {
+      throw new Error('Lỗi khi truy vấn danh sách phim');
+    }
+  }
 }

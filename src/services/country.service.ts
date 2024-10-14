@@ -3,8 +3,8 @@ import { Repository, EntityRepository } from 'typeorm';
 import { Service } from 'typedi';
 import { Country } from '@interfaces/country.interface';
 import axios from 'axios';
-import { CRAWL_ENDPOINT } from '@/config';
-import { logger } from '@/utils/logger';
+import { CRAWL_ENDPOINT } from '@config';
+import { logger } from '@utils/logger';
 import { NODE_ENV } from '@config';
 
 @Service()
@@ -47,6 +47,15 @@ export class CountryService extends Repository<CountryEntity> {
       logger.error(`======= ENV: ${NODE_ENV} =======`);
       logger.error(`🚀 Lỗi khi gọi API hoặc lưu dữ liệu countries:`, error);
       logger.error(`=================================`);
+    }
+  }
+
+  public async getCountries(): Promise<Country[]> {
+    try {
+      const countries = await CountryEntity.createQueryBuilder('country').select(['country.name', 'country.slug']).getMany();
+      return countries;
+    } catch (error) {
+      logger.error(`🚀 Lỗi khi lấy countries từ db`);
     }
   }
 }

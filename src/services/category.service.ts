@@ -50,4 +50,13 @@ export class CategoryService extends Repository<CategoryEntity> {
       logger.error(`=================================`);
     }
   }
+
+  public async getCategories(): Promise<Category[]> {
+    try {
+      const categories = await CategoryEntity.createQueryBuilder('category').select(['category.name', 'category.slug']).getMany();
+      return categories;
+    } catch (error) {
+      logger.error(`🚀 Lỗi khi lấy categories từ db`);
+    }
+  }
 }

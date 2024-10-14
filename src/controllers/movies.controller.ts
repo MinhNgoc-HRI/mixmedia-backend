@@ -24,4 +24,18 @@ export class MovieController {
       next(erros);
     }
   };
+
+  public getMoviesByBody = async (
+    req: Request<{}, {}, { page?: number; total?: number; country?: string[]; category?: string[]; slug?: string; asc?: boolean }, {}>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    const { page, total, category, country, asc, slug } = req.body;
+    try {
+      const rs = await this.movie.getMovieByQuery(page, total, country, category, slug, asc);
+      res.status(200).json({ status: true, message: 'success', ...rs });
+    } catch (erros) {
+      next(erros);
+    }
+  };
 }

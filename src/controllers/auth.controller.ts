@@ -41,4 +41,14 @@ export class AuthController {
       next(error);
     }
   };
+
+  public async refresh(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { refreshToken } = req.body;
+      const newTokens = await this.auth.refreshToken(refreshToken);
+      res.status(200).json({ status: true, message: 'Token refreshed successfully', data: newTokens });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
