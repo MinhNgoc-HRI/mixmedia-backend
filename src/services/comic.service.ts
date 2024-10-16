@@ -239,7 +239,7 @@ export class ComicService extends Repository<ComicEntity> {
   }> {
     try {
       // Khởi tạo query builder cho thực thể Comic
-      const queryBuilder = ComicEntity.createQueryBuilder('comic')
+      const queryBuilder = await ComicEntity.createQueryBuilder('comic')
         .leftJoinAndSelect('comic.category', 'comic_category') // Join với bảng comic_category
         .addSelect('comic_category.id', 'category_id'); // Join với bảng chapters
 

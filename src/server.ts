@@ -16,8 +16,8 @@ const app = new App([
   new MovieRoute(),
   new CategoryRoute(),
   new CountryRoute(),
-  new ComicCategoryRoute(),
   new ComicRoute(),
+  new ComicCategoryRoute(),
 ]);
 
 app.listen();
