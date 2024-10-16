@@ -1,5 +1,5 @@
 import { Comic } from '@interfaces/comic.interface';
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany, Relation } from 'typeorm';
 import { ComicCategoryEntity } from '@entities/comic_category.entity';
 import { ChapterEntity } from '@entities/chapter.entity';
 
@@ -34,10 +34,10 @@ export class ComicEntity extends BaseEntity implements Comic {
 
   @ManyToMany(() => ComicCategoryEntity)
   @JoinTable()
-  category: ComicCategoryEntity[];
+  category: Relation<ComicCategoryEntity>[];
 
   @OneToMany(() => ChapterEntity, chapter => chapter.comic)
-  chapters: ChapterEntity[];
+  chapters: Relation<ChapterEntity>[];
 
   @Column({ nullable: true })
   updatedAt: Date;

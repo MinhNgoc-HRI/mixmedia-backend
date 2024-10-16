@@ -1,5 +1,5 @@
 import { Chapter } from '@interfaces/chapter.interface';
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToOne, Relation } from 'typeorm';
 import { ComicEntity } from '@entities/comic.entity';
 
 @Entity('chapter')
@@ -20,5 +20,5 @@ export class ChapterEntity extends BaseEntity implements Chapter {
   };
 
   @ManyToOne(() => ComicEntity, comic => comic.chapters)
-  comic: ComicEntity;
+  comic: Relation<ComicEntity>;
 }
