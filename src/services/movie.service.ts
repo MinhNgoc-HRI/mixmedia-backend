@@ -14,7 +14,7 @@ import { Episode } from '@/interfaces/episode.interface';
 @Service()
 @EntityRepository()
 export class MovieService extends Repository<MovieEntity> {
-  public async insertMovie(movieData: Movie, episodeData: Episode[]): Promise<Movie> {
+  public async insertMovie(movieData: any, episodeData: Episode[]): Promise<Movie> {
     const movieRepo = MovieEntity.getRepository();
     const categoryRepo = CategoryEntity.getRepository();
     const countryRepo = CountryEntity.getRepository();
@@ -52,7 +52,8 @@ export class MovieService extends Repository<MovieEntity> {
     movie.director = movieData?.director || [];
     movie.chieurap = movieData?.chieurap || false;
     movie.sub_docquyen = movieData?.sub_docquyen || false;
-
+    movie.created = movieData?.created?.time || null;
+    movie.modified = movieData?.modified?.time || null;
     // Xử lý danh mục (category)
     const categories = await Promise.all(
       (movieData?.category || []).map(async (cat: any) => {
@@ -137,7 +138,7 @@ export class MovieService extends Repository<MovieEntity> {
     } catch (error) {
       logger.error(`=================================`);
       logger.error(`======= ENV: ${NODE_ENV} =======`);
-      logger.error(`🚀 Lỗi khi gọi API hoặc lưu dữ liệu phim:`, error);
+      logger.error(`🚀 Lỗi khi gọi API hoặc lưu dữ liệu phim: ${slug}`, error);
       logger.error(`=================================`);
     }
   }

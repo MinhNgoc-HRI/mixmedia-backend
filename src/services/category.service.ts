@@ -3,8 +3,8 @@ import { EntityRepository, Repository } from 'typeorm';
 import { Service } from 'typedi';
 import { Category } from '@interfaces/category.interface';
 import axios from 'axios';
-import { CRAWL_ENDPOINT } from '@/config';
-import { logger } from '@/utils/logger';
+import { CRAWL_ENDPOINT } from '@config';
+import { logger } from '@utils/logger';
 import { NODE_ENV } from '@config';
 
 @Service()
