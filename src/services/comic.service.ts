@@ -101,53 +101,57 @@ export class ComicService extends Repository<ComicEntity> {
         const chapters = comic.chapters || [];
 
         // Sử dụng map để xử lý các server_data của từng chapter
-        for (const chapter of chapters) {
-          if (chapter.server_data) {
-            // Sử dụng Promise.all và map để xử lý server_data array
-            const updatedServerData = await Promise.all(
-              chapter.server_data.map(async server => {
-                const chapterApiUrl = server.chapter_api_data;
+        const updatedChapters = await Promise.all(
+          chapters.map(async chapter => {
+            if (chapter.server_data) {
+              try {
+                const updatedServerData = await Promise.all(
+                  chapter.server_data.map(async server => {
+                    const chapterApiUrl = server.chapter_api_data;
 
-                if (chapterApiUrl) {
-                  try {
-                    // Gọi API cho chapter_api_data để lấy thông tin chi tiết
-                    const chapterResponse = await axios.get(chapterApiUrl, { timeout: 30000 });
+                    if (chapterApiUrl) {
+                      try {
+                        const chapterResponse = await axios.get(`${chapterApiUrl}`, { timeout: 30000 });
 
-                    if (chapterResponse.data?.status === 'success' && chapterResponse.data?.data) {
-                      const chapterData = chapterResponse.data.data;
-                      // Tạo đường dẫn đầy đủ từ domain_cdn và chapter_path
-                      const fullChapterPath = `${chapterData.domain_cdn}/${chapterData.item.chapter_path}`;
-                      // Trả về đối tượng đã được cập nhật với chapter_path và chapter_image
-                      return {
-                        ...server,
-                        chapter_path: fullChapterPath,
-                        chapter_image: chapterData.item.chapter_image,
-                      };
-                    } else {
-                      logger.warn(`Không có dữ liệu cho chapter ${server.chapter_name}.`);
+                        if (chapterResponse.data?.status === 'success' && chapterResponse.data?.data) {
+                          const chapterData = chapterResponse.data.data;
+                          return {
+                            ...server,
+                            chapter_path: `${chapterData.domain_cdn}/${chapterData.item.chapter_path}`,
+                            chapter_image: chapterData.item.chapter_image,
+                          };
+                        } else {
+                          logger.warn(`Không có dữ liệu cho chapter ${server.chapter_name}.`);
+                        }
+                      } catch (chapterError) {
+                        logger.error(`Lỗi khi gọi API cho chapter ${server.chapter_name}: ${chapterError.message}`);
+                      }
                     }
-                  } catch (chapterError) {
-                    logger.error(`Lỗi khi gọi API cho chapter ${server.chapter_name}: ${chapterError.message}`);
-                  }
-                }
-                // Nếu không gọi API được, giữ nguyên dữ liệu hiện tại
-                return server;
-              }),
-            );
 
-            // Gán lại updatedServerData cho chapter.server_data
-            chapter.server_data = updatedServerData;
-          }
-        }
-        await this.insertComic(comic, chapters);
+                    // Nếu không gọi API được, giữ nguyên dữ liệu hiện tại
+                    return server;
+                  }),
+                );
+
+                chapter.server_data = updatedServerData;
+              } catch (chapterError) {
+                logger.error(`Lỗi khi xử lý chapter ${chapter.name}: ${chapterError.message}`);
+              }
+            }
+
+            return chapter;
+          }),
+        );
+
+        await this.insertComic(comic, updatedChapters);
         logger.info(`=================================`);
         logger.info(`======= ENV: ${NODE_ENV} =======`);
-        logger.info(`🚀 Đã lưu thành công comic ${comic.name} vào cơ sở dữ liệu.`);
+        logger.info(` Đã lưu thành công comic ${comic.name} vào cơ sở dữ liệu.`);
         logger.info(`=================================`);
       } else {
         logger.info(`=================================`);
         logger.info(`======= ENV: ${NODE_ENV} =======`);
-        logger.info('🚀 Không có dữ liệu comic để lưu.');
+        logger.info(' Không có dữ liệu comic để lưu.');
         logger.info(`=================================`);
       }
     } catch (error) {
