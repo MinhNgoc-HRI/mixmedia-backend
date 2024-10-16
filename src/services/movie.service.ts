@@ -119,7 +119,7 @@ export class MovieService extends Repository<MovieEntity> {
 
     try {
       const response = await axios.get(`${CRAWL_ENDPOINT}/phim/${slug}`, {
-        timeout: 10000,
+        timeout: 30000,
       });
       if (response.data?.status === true && response.data?.movie) {
         const movie = response.data.movie;
@@ -146,7 +146,7 @@ export class MovieService extends Repository<MovieEntity> {
   public async fetchMovies(page: number): Promise<{ movies: Movie[]; pagination: { currentPage: number; totalPages: number } } | null> {
     try {
       const response = await axios.get(`${CRAWL_ENDPOINT}/danh-sach/phim-moi-cap-nhat?page=${page}`, {
-        timeout: 10000,
+        timeout: 30000,
       });
 
       // Lấy danh sách phim từ response

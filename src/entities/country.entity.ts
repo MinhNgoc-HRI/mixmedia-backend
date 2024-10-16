@@ -9,6 +9,6 @@ export class CountryEntity extends BaseEntity implements Country {
   @Column()
   name: string;
 
-  @Column({ unique: true })
+  @Column()
   slug: string;
 }

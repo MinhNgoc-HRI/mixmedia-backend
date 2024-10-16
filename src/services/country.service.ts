@@ -27,7 +27,7 @@ export class CountryService extends Repository<CountryEntity> {
   public async fetchAndSaveCountries(): Promise<void> {
     try {
       const response = await axios.get(`${CRAWL_ENDPOINT}/v1/api/quoc-gia`, {
-        timeout: 10000,
+        timeout: 30000,
       });
       if (response.data.status === 'success') {
         const countries = response.data.data.items;

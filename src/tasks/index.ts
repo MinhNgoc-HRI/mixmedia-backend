@@ -39,7 +39,7 @@ export class CronJobService {
       }
     });
 
-    cron.schedule('20 12 * * *', async () => {
+    cron.schedule('54 13 * * *', async () => {
       try {
         let currentPage = 1;
         let totalPages = 1;
@@ -71,7 +71,7 @@ export class CronJobService {
       }
     });
 
-    cron.schedule('28 10 * * *', async () => {
+    cron.schedule('09 14 * * *', async () => {
       try {
         let currentPage = 1;
         let totalPages = 1;

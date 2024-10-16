@@ -28,7 +28,7 @@ export class CategoryService extends Repository<CategoryEntity> {
   public async fetchAndSaveCategories(): Promise<void> {
     try {
       const response = await axios.get(`${CRAWL_ENDPOINT}/v1/api/the-loai`, {
-        timeout: 10000,
+        timeout: 30000,
       });
       if (response.data.status === 'success') {
         const categories = response.data.data.items;

@@ -9,6 +9,6 @@ export class ComicCategoryEntity extends BaseEntity implements ComicCategory {
   @Column()
   name: string;
 
-  @Column({ unique: true })
+  @Column()
   slug: string;
 }

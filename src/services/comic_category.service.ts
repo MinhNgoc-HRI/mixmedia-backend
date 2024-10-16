@@ -29,7 +29,7 @@ export class ComicCategoryService extends Repository<ComicCategoryEntity> {
   public async fetchAndSaveComicCategories(): Promise<void> {
     try {
       const response = await axios.get(`${CRAWL_ENDPOINT_COMIC}/v1/api/the-loai`, {
-        timeout: 10000,
+        timeout: 30000,
       });
       if (response.data.status === 'success') {
         const categories = response.data.data.items;

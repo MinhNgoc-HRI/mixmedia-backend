@@ -88,7 +88,7 @@ export class ComicService extends Repository<ComicEntity> {
 
     try {
       const response = await axios.get(`${CRAWL_ENDPOINT_COMIC}/v1/api/truyen-tranh/${slug}`, {
-        timeout: 10000,
+        timeout: 30000,
       });
 
       if (response.data?.status === 'success' && response.data?.data?.item) {
@@ -111,7 +111,7 @@ export class ComicService extends Repository<ComicEntity> {
                 if (chapterApiUrl) {
                   try {
                     // Gọi API cho chapter_api_data để lấy thông tin chi tiết
-                    const chapterResponse = await axios.get(chapterApiUrl, { timeout: 10000 });
+                    const chapterResponse = await axios.get(chapterApiUrl, { timeout: 30000 });
 
                     if (chapterResponse.data?.status === 'success' && chapterResponse.data?.data) {
                       const chapterData = chapterResponse.data.data;
@@ -158,7 +158,7 @@ export class ComicService extends Repository<ComicEntity> {
   public async fetchComics(page: number): Promise<{ comics: Comic[]; pagination: { currentPage: number; totalPages: number } } | null> {
     try {
       const response = await axios.get(`${CRAWL_ENDPOINT_COMIC}/v1/api/danh-sach/truyen-moi?page=${page}`, {
-        timeout: 10000,
+        timeout: 30000,
       });
       const comics = response?.data?.data?.items;
       const params = response?.data?.data?.params;

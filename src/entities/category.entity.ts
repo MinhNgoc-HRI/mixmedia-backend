@@ -9,6 +9,6 @@ export class CategoryEntity extends BaseEntity implements Category {
   @Column()
   name: string;
 
-  @Column({ unique: true })
+  @Column()
   slug: string;
 }
