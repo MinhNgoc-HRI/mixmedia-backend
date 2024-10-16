@@ -71,7 +71,7 @@ export class CronJobService {
       }
     });
 
-    cron.schedule('09 14 * * *', async () => {
+    cron.schedule('18 16 * * *', async () => {
       try {
         let currentPage = 1;
         let totalPages = 1;

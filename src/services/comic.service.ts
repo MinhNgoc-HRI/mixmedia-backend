@@ -7,10 +7,12 @@ import { ChapterEntity } from '@entities/chapter.entity';
 import { logger } from '@utils/logger';
 import axios from 'axios';
 import { CRAWL_ENDPOINT_COMIC } from '@config';
-import { NODE_ENV } from '@config';
 import { Service } from 'typedi';
 import { MovieEntity } from '@entities/movie.entity';
+import https from 'https';
+import pLimit from '@esm2cjs/p-limit';
 
+const limit = pLimit(10);
 @Service()
 @EntityRepository()
 export class ComicService extends Repository<ComicEntity> {
@@ -93,44 +95,44 @@ export class ComicService extends Repository<ComicEntity> {
 
       if (response.data?.status === 'success' && response.data?.data?.item) {
         const comic = response.data?.data?.item;
-        const thumb_url = response.data?.data?.seoOnPage?.seoSchema?.image;
-        if (thumb_url && comic?.thumb_url) {
-          comic.thumb_url = thumb_url;
-        }
-
         const chapters = comic.chapters || [];
 
-        // Sử dụng map để xử lý các server_data của từng chapter
         const updatedChapters = await Promise.all(
           chapters.map(async chapter => {
             if (chapter.server_data) {
               try {
                 const updatedServerData = await Promise.all(
-                  chapter.server_data.map(async server => {
-                    const chapterApiUrl = server.chapter_api_data;
+                  chapter.server_data.map(server =>
+                    limit(async () => {
+                      const chapterApiUrl = server.chapter_api_data;
 
-                    if (chapterApiUrl) {
-                      try {
-                        const chapterResponse = await axios.get(`${chapterApiUrl}`, { timeout: 30000 });
+                      if (chapterApiUrl) {
+                        try {
+                          const chapterResponse = await axios.get(`${chapterApiUrl}`, {
+                            timeout: 30000,
+                            httpsAgent: new https.Agent({
+                              rejectUnauthorized: false,
+                            }),
+                          });
 
-                        if (chapterResponse.data?.status === 'success' && chapterResponse.data?.data) {
-                          const chapterData = chapterResponse.data.data;
-                          return {
-                            ...server,
-                            chapter_path: `${chapterData.domain_cdn}/${chapterData.item.chapter_path}`,
-                            chapter_image: chapterData.item.chapter_image,
-                          };
-                        } else {
-                          logger.warn(`Không có dữ liệu cho chapter ${server.chapter_name}.`);
+                          if (chapterResponse.data?.status === 'success' && chapterResponse.data?.data) {
+                            const chapterData = chapterResponse.data.data;
+                            return {
+                              ...server,
+                              chapter_path: `${chapterData.domain_cdn}/${chapterData.item.chapter_path}`,
+                              chapter_image: chapterData.item.chapter_image,
+                            };
+                          } else {
+                            logger.warn(`Không có dữ liệu cho chapter ${server.chapter_name}.`);
+                          }
+                        } catch (chapterError) {
+                          logger.error(`Lỗi khi gọi API cho chapter ${server.chapter_name}: ${chapterError.message}`);
                         }
-                      } catch (chapterError) {
-                        logger.error(`Lỗi khi gọi API cho chapter ${server.chapter_name}: ${chapterError.message}`);
                       }
-                    }
 
-                    // Nếu không gọi API được, giữ nguyên dữ liệu hiện tại
-                    return server;
-                  }),
+                      return server;
+                    }),
+                  ),
                 );
 
                 chapter.server_data = updatedServerData;
@@ -144,21 +146,14 @@ export class ComicService extends Repository<ComicEntity> {
         );
 
         await this.insertComic(comic, updatedChapters);
-        logger.info(`=================================`);
-        logger.info(`======= ENV: ${NODE_ENV} =======`);
-        logger.info(` Đã lưu thành công comic ${comic.name} vào cơ sở dữ liệu.`);
-        logger.info(`=================================`);
+        logger.info(`Đã lưu thành công comic ${comic.name} vào cơ sở dữ liệu.`);
       } else {
-        logger.info(`=================================`);
-        logger.info(`======= ENV: ${NODE_ENV} =======`);
-        logger.info(' Không có dữ liệu comic để lưu.');
-        logger.info(`=================================`);
+        logger.info('Không có dữ liệu comic để lưu.');
       }
     } catch (error) {
       logger.error(`Lỗi khi gọi API cho comic ${slug}: ${error.message}`);
     }
   }
-
   public async fetchComics(page: number): Promise<{ comics: Comic[]; pagination: { currentPage: number; totalPages: number } } | null> {
     try {
       const response = await axios.get(`${CRAWL_ENDPOINT_COMIC}/v1/api/danh-sach/truyen-moi?page=${page}`, {
