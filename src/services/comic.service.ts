@@ -246,9 +246,9 @@ export class ComicService extends Repository<ComicEntity> {
         .leftJoinAndSelect('comic.category', 'comic_category') // Join với bảng comic_category
         .addSelect('comic_category.id', 'category_id'); // Join với bảng chapters
 
-      // Thêm điều kiện lọc theo slug (nếu có)
+      // Thêm điều kiện lọc theo slug (nếu có) bằng Auto complete-Text Search
       if (slug) {
-        queryBuilder.andWhere('comic.name LIKE :slug', { slug: `%${slug}%` });
+        queryBuilder.andWhere('comic.name ILIKE :slug', { slug: `%${slug}%` });
       }
 
       // Thêm điều kiện lọc theo slug của category (nếu có)
