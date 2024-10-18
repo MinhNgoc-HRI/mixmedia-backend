@@ -6,7 +6,7 @@ import { ComicCategoryEntity } from '@entities/comic_category.entity';
 import { ChapterEntity } from '@entities/chapter.entity';
 import { logger } from '@utils/logger';
 import axios from 'axios';
-import { CRAWL_ENDPOINT_COMIC } from '@config';
+import { APP_DOMAIN_CDN_IMAGE, CRAWL_ENDPOINT_COMIC } from '@config';
 import { Service } from 'typedi';
 import { MovieEntity } from '@entities/movie.entity';
 import https from 'https';
@@ -187,11 +187,12 @@ export class ComicService extends Repository<ComicEntity> {
     total_items: number;
     current_page: number;
     total_pages: number;
+    APP_DOMAIN_CDN_IMAGE: string;
   }> {
     // Xác định page và total mặc định
     const pageNum = page > 0 ? page : 1;
     const totalItemsPerPage = total > 0 ? total : 20; // Mặc định 20 item nếu không chỉ định
-    const totalItems = await MovieEntity.createQueryBuilder('movie').getCount(); // Đếm tổng số lượng comic trong database
+    const totalItems = await ComicEntity.createQueryBuilder('comic').getCount(); // Đếm tổng số lượng comic trong database
     // Tính tổng số trang
     const totalPages = Math.ceil(totalItems / totalItemsPerPage);
     const comics = await ComicEntity.createQueryBuilder('comic')
@@ -206,11 +207,12 @@ export class ComicService extends Repository<ComicEntity> {
       total_items: totalItems,
       current_page: pageNum,
       total_pages: totalPages,
+      APP_DOMAIN_CDN_IMAGE: APP_DOMAIN_CDN_IMAGE,
     };
   }
 
   // Lấy comic theo slug
-  public async getComicBySlug(slug: string): Promise<{ data: Comic }> {
+  public async getComicBySlug(slug: string): Promise<{ data: Comic; APP_DOMAIN_CDN_IMAGE: string }> {
     const comic = await ComicEntity.createQueryBuilder('comic')
       .leftJoinAndSelect('comic.category', 'comic_category') // Join với bảng comic_category
       .leftJoinAndSelect('comic.chapters', 'chapters') // Join với bảng chapters
@@ -220,6 +222,7 @@ export class ComicService extends Repository<ComicEntity> {
 
     return {
       data: comic,
+      APP_DOMAIN_CDN_IMAGE: APP_DOMAIN_CDN_IMAGE,
     };
   }
 
@@ -235,6 +238,7 @@ export class ComicService extends Repository<ComicEntity> {
     total_items: number;
     current_page: number;
     total_pages: number;
+    APP_DOMAIN_CDN_IMAGE: string;
   }> {
     try {
       // Khởi tạo query builder cho thực thể Comic
@@ -277,6 +281,7 @@ export class ComicService extends Repository<ComicEntity> {
         total_items,
         current_page: page,
         total_pages,
+        APP_DOMAIN_CDN_IMAGE: APP_DOMAIN_CDN_IMAGE,
       };
     } catch (error) {
       throw new Error('Lỗi khi truy vấn danh sách comic');
