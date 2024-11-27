@@ -24,22 +24,22 @@ export class CronJobService {
   }
 
   private initializeCronJobs() {
-    cron.schedule('22 15 * * *', async () => {
-      try {
-        await this.countryService.fetchAndSaveCountries();
-      } catch (error) {
-        logger.error('Error fetching countries:', error);
-      }
-    });
-    cron.schedule('22 15 * * *', async () => {
-      try {
-        await this.categoryService.fetchAndSaveCategories();
-      } catch (error) {
-        logger.error('Error fetching categories:', error);
-      }
-    });
+    // cron.schedule('03 14 * * *', async () => {
+    //   try {
+    //     await this.countryService.fetchAndSaveCountries();
+    //   } catch (error) {
+    //     logger.error('Error fetching countries:', error);
+    //   }
+    // });
+    // cron.schedule('22 15 * * *', async () => {
+    //   try {
+    //     await this.categoryService.fetchAndSaveCategories();
+    //   } catch (error) {
+    //     logger.error('Error fetching categories:', error);
+    //   }
+    // });
 
-    cron.schedule('54 13 * * *', async () => {
+    cron.schedule('04 14 * * *', async () => {
       try {
         let currentPage = 1;
         let totalPages = 1;
@@ -63,36 +63,36 @@ export class CronJobService {
       }
     });
 
-    cron.schedule('55 21 * * *', async () => {
-      try {
-        await this.comicCategoryService.fetchAndSaveComicCategories();
-      } catch (error) {
-        logger.error('Error fetching comic categories:', error);
-      }
-    });
+    // cron.schedule('55 21 * * *', async () => {
+    //   try {
+    //     await this.comicCategoryService.fetchAndSaveComicCategories();
+    //   } catch (error) {
+    //     logger.error('Error fetching comic categories:', error);
+    //   }
+    // });
 
-    cron.schedule('18 16 * * *', async () => {
-      try {
-        let currentPage = 1;
-        let totalPages = 1;
+    // cron.schedule('18 16 * * *', async () => {
+    //   try {
+    //     let currentPage = 1;
+    //     let totalPages = 1;
 
-        do {
-          // Gọi hàm fetchComics để lấy danh sách phim
-          const result = await this.comicService.fetchComics(currentPage);
+    //     do {
+    //       // Gọi hàm fetchComics để lấy danh sách phim
+    //       const result = await this.comicService.fetchComics(currentPage);
 
-          if (result && result.pagination) {
-            totalPages = result.pagination.totalPages; // Lấy tổng số trang
-            currentPage++; // Tăng số trang lên 1
-          } else {
-            logger.info('Không có dữ liệu comic mới.');
-            break; // Thoát vòng lặp nếu không có dữ liệu
-          }
-        } while (currentPage <= totalPages); // Tiếp tục cho đến khi đã lấy tất cả các trang
+    //       if (result && result.pagination) {
+    //         totalPages = result.pagination.totalPages; // Lấy tổng số trang
+    //         currentPage++; // Tăng số trang lên 1
+    //       } else {
+    //         logger.info('Không có dữ liệu comic mới.');
+    //         break; // Thoát vòng lặp nếu không có dữ liệu
+    //       }
+    //     } while (currentPage <= totalPages); // Tiếp tục cho đến khi đã lấy tất cả các trang
 
-        logger.info('Cron job đã hoàn thành.');
-      } catch (error) {
-        logger.error('Lỗi khi thực thi cron job:', error);
-      }
-    });
+    //     logger.info('Cron job đã hoàn thành.');
+    //   } catch (error) {
+    //     logger.error('Lỗi khi thực thi cron job:', error);
+    //   }
+    // });
   }
 }

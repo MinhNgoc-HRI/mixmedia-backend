@@ -8,7 +8,6 @@ import { logger } from '@utils/logger';
 import axios from 'axios';
 import { APP_DOMAIN_CDN_IMAGE, CRAWL_ENDPOINT_COMIC } from '@config';
 import { Service } from 'typedi';
-import { MovieEntity } from '@entities/movie.entity';
 import https from 'https';
 import pLimit from '@esm2cjs/p-limit';
 
