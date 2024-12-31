@@ -1,7 +1,7 @@
 import { CategoryEntity } from '@/entities/category.entity';
 import { CountryEntity } from '@/entities/country.entity';
 import { EpisodeEntity } from '@/entities/episode.entity';
-import { Movie } from '@/interfaces/movie.interface';
+import { Movie, MovieKphim } from '@/interfaces/movie.interface';
 import { MovieEntity } from '@entities/movie.entity';
 import { Service } from 'typedi';
 import { EntityRepository, Repository } from 'typeorm';
@@ -14,7 +14,7 @@ import { Episode } from '@/interfaces/episode.interface';
 @Service()
 @EntityRepository()
 export class MovieService extends Repository<MovieEntity> {
-  public async insertMovie(movieData: any, episodeData: Episode[]): Promise<Movie> {
+  public async insertMovie(movieData: MovieKphim, episodeData: Episode[]): Promise<Movie> {
     const movieRepo = MovieEntity.getRepository();
     const categoryRepo = CategoryEntity.getRepository();
     const countryRepo = CountryEntity.getRepository();
@@ -29,6 +29,7 @@ export class MovieService extends Repository<MovieEntity> {
     }
 
     // Gán giá trị cho movie
+    movie.tmdb = movieData?.tmdb;
     movie.name = movieData?.name || '';
     movie.slug = movieData?.slug || '';
     movie.origin_name = movieData?.origin_name || '';

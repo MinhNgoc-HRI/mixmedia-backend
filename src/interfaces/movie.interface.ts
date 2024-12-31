@@ -4,6 +4,7 @@ import { Episode } from '@interfaces/episode.interface';
 
 export interface Movie {
   _id: string;
+  tmdb: { type: string; id: string; season: number; vote_average: number; vote_count: number };
   name: string;
   slug: string;
   origin_name: string;
@@ -32,4 +33,13 @@ export interface Movie {
   episodes: Episode[];
   created: Date;
   modified: Date;
+}
+
+export interface MovieKphim extends Omit<Movie, 'created' | 'modified'> {
+  created: {
+    time: Date;
+  };
+  modified: {
+    time: Date;
+  };
 }

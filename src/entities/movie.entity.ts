@@ -9,6 +9,9 @@ export class MovieEntity extends BaseEntity implements Movie {
   @PrimaryGeneratedColumn('uuid')
   _id: string;
 
+  @Column({ type: 'json', nullable: true })
+  tmdb: { type: string; id: string; season: number; vote_average: number; vote_count: number };
+
   @Column({ nullable: true })
   name: string;
 
